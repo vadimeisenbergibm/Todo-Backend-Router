@@ -68,3 +68,6 @@ fastlane/test_output
 
 # emacs backup files
 *~
+
+# ignore Package.resolved
+Package.resolved
