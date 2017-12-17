@@ -26,7 +26,7 @@ public struct RouterCreator {
 
         router.all("/", middleware: CORS(options: Options(allowedOrigin: .all,
                                                           methods: ["GET","POST", "PATCH", "DELETE", "OPTIONS"],
-                                                          allowedHeaders: ["Content-Type"],
+                                                          allowedHeaders: ["Content-Type", "Accept"],
                                                           preflightContinue: true)))
 
         router.options("/") { _, response, next in
