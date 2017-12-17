@@ -28,13 +28,14 @@ let package = Package(
         )
     ],
     dependencies: [
-      .package(url: "https://github.com/IBM-Swift/Kitura.git", .upToNextMajor(from: "2.0.0")),
+      .package(url: "https://github.com/IBM-Swift/Kitura.git", .upToNextMinor(from: "2.0.0")),
+      .package(url: "https://github.com/IBM-Swift/Kitura-CORS.git", .upToNextMinor(from: "2.0.0")),
       .package(url: "https://github.com/vadimeisenbergibm/Todo-Backend-DataLayer.git", .upToNextMajor(from: "0.0.0")),
     ],
     targets: [
         .target(
             name: "TodoBackendRouter",
-            dependencies: ["Kitura", "TodoBackendDataLayer"]
+            dependencies: ["Kitura", "TodoBackendDataLayer", "KituraCORS"]
         )
     ]
 )
