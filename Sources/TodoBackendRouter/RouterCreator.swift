@@ -33,6 +33,11 @@ public struct RouterCreator {
             response.status(.OK)
             next()
         }
+
+        router.get("/") { _, response, next in
+            response.status(.OK)
+            next()
+        }
         return router
     }
 }
