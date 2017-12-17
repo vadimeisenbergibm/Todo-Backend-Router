@@ -26,7 +26,8 @@ public struct RouterCreator {
 
         router.all("/", middleware: CORS(options: Options(allowedOrigin: .origin("www.todobackend.com"),
                                                           methods: ["GET","POST", "PATCH", "DELETE", "OPTIONS"],
-                                                          allowedHeaders: ["Content-Type"])))
+                                                          allowedHeaders: ["Content-Type"],
+                                                          preflightContinue: true)))
 
         router.options("/") { _, response, next in
             response.status(.OK)
