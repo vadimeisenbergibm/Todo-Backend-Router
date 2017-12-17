@@ -18,7 +18,7 @@ import Kitura
 import TodoBackendDataLayer
 
 public struct RouterCreator {
-    public func create(dataLayer: DataLayer) -> Router {
+    public static func create(dataLayer: DataLayer) -> Router {
         let router = Router()
         return router
     }
