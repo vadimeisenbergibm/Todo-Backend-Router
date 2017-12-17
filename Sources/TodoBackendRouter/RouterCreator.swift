@@ -15,11 +15,26 @@
  **/
 
 import Kitura
+import KituraCORS
+import LoggerAPI
+
 import TodoBackendDataLayer
 
 public struct RouterCreator {
     public static func create(dataLayer: DataLayer) -> Router {
         let router = Router()
+
+        router.all("/", middleware: CORS(options: Options(allowedOrigin: .origin("www.todobackend.com"),
+                                                          methods: ["GET","POST", "PATCH", "DELETE", "OPTIONS"],
+                                                          allowedHeaders: ["Content-Type"])))
+
+        router.options("/") { _, response, next in
+            do {
+                try response.send(status: .OK).end()
+            } catch {
+                Log.error("Caught an error while sending a response: \(error)")
+            }
+        }
         return router
     }
 }
