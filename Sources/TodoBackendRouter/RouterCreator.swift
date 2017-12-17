@@ -29,11 +29,8 @@ public struct RouterCreator {
                                                           allowedHeaders: ["Content-Type"])))
 
         router.options("/") { _, response, next in
-            do {
-                try response.send(status: .OK).end()
-            } catch {
-                Log.error("Caught an error while sending a response: \(error)")
-            }
+            response.status(.OK)
+            next()
         }
         return router
     }
