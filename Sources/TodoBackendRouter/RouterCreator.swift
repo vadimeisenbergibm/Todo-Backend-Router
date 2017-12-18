@@ -24,7 +24,7 @@ public struct RouterCreator {
     public static func create(dataLayer: DataLayer) -> Router {
         let router = Router()
 
-        router.all("/", middleware: CORS(options: Options(allowedOrigin: .origin("www.todobackend.com"),
+        router.all("/", middleware: CORS(options: Options(allowedOrigin: .origin("https://www.todobackend.com"),
                                                           methods: ["GET","POST", "PATCH", "DELETE", "OPTIONS"],
                                                           allowedHeaders: ["Content-Type"],
                                                           preflightContinue: true)))
