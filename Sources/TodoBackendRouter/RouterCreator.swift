@@ -28,8 +28,11 @@ public struct RouterCreator {
                                                           methods: ["GET","POST", "PATCH", "DELETE", "OPTIONS"])))
 
         router.options("/") { _, response, next in
-            response.status(.OK)
-            next()
+            do {
+                try response.send(status: .OK).end()
+            } catch {
+                Log.error("Caught an error while sending a response: \(error)")
+            }
         }
         return router
     }
