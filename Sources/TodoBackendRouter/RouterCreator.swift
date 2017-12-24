@@ -23,8 +23,8 @@ import KituraCORS
 import TodoBackendDataLayer
 
 public struct RouterCreator {
-    let dataLayer: DataLayer
-    let dataLayerConverter: DataLayerConverter
+    private let dataLayer: DataLayer
+    private let dataLayerConverter: DataLayerConverter
 
     init(dataLayer: DataLayer, baseURL: URL) {
         self.dataLayer = dataLayer
@@ -49,7 +49,7 @@ public struct RouterCreator {
         return router
     }
 
-    func getTodos(completion: ([Todo]?, RequestError?) -> Void) {
+    private func getTodos(completion: ([Todo]?, RequestError?) -> Void) {
         dataLayer.get() { result in
             switch result {
             case .success(let todos):
@@ -60,7 +60,7 @@ public struct RouterCreator {
         }
     }
 
-    func getTodo(id: String, completion: (Todo?, RequestError?) -> Void) {
+    private func getTodo(id: String, completion: (Todo?, RequestError?) -> Void) {
         dataLayer.get(id: id) { result in
             switch result {
             case .success(let todo):
@@ -71,7 +71,7 @@ public struct RouterCreator {
         }
     }
 
-    func addTodo(todoPatch: TodoPatch, completion: (Todo?, RequestError?) -> Void ) {
+    private func addTodo(todoPatch: TodoPatch, completion: (Todo?, RequestError?) -> Void ) {
         guard let title = todoPatch.title, title != "" else {
             return completion(nil, .badRequest)
         }
@@ -88,7 +88,7 @@ public struct RouterCreator {
         }
     }
 
-    func deleteTodo(id: String, completion: (RequestError?) -> Void) {
+    private func deleteTodo(id: String, completion: (RequestError?) -> Void) {
         dataLayer.delete(id: id) { result in
             switch result {
             case .success:
@@ -99,7 +99,7 @@ public struct RouterCreator {
         }
     }
 
-    func deleteTodos(completion: (RequestError?) -> Void) {
+    private func deleteTodos(completion: (RequestError?) -> Void) {
         dataLayer.delete() { result in
             switch result {
             case .success:
