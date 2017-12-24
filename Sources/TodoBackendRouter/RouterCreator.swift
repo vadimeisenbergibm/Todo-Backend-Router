@@ -23,16 +23,40 @@ import KituraCORS
 import TodoBackendDataLayer
 
 public struct RouterCreator {
-    private let dataLayer: DataLayer
-    private let dataLayerTodoConverter: DataLayerTodoConverter
-    private let dataLayerErrorConverter = DataLayerErrorConverter()
 
-    public init(dataLayer: DataLayer, baseURL: URL) {
-        self.dataLayer = dataLayer
-        self.dataLayerTodoConverter = DataLayerTodoConverter(baseURL: baseURL)
-    }
+    public static func create(dataLayer: DataLayer, baseURL: URL) -> Router {
+        var dataLayer = dataLayer
+        let dataLayerTodoConverter = DataLayerTodoConverter(baseURL: baseURL)
+        let dataLayerErrorConverter = DataLayerErrorConverter()
 
-    public func create(dataLayer: DataLayer, baseURL: URL) -> Router {
+        func getTodos(completion: ([Todo]?, RequestError?) -> Void) {
+            dataLayer.get() { result in
+                switch result {
+                case .success(let todos):
+                    completion(todos.map { dataLayerTodoConverter.convert($0) }, nil)
+                case .failure(let error):
+                    completion(nil, dataLayerErrorConverter.convert(error))
+                }
+            }
+        }
+
+        func addTodo(todoPatch: TodoPatch, completion: (Todo?, RequestError?) -> Void ) {
+            guard let title = todoPatch.title, title != "" else {
+                return completion(nil, .badRequest)
+            }
+            let completed = todoPatch.completed ?? false
+            let order = todoPatch.order
+
+            dataLayer.add(title: title, order: order, completed: completed) { result in
+                switch result {
+                case .success(let todo):
+                    completion(dataLayerTodoConverter.convert(todo), nil)
+                case .failure(let error):
+                    completion(nil, dataLayerErrorConverter.convert(error))
+                }
+            }
+        }
+
         let router = Router()
 
         let corsOptions = Options(allowedOrigin: .origin("https://www.todobackend.com"),
@@ -40,18 +64,7 @@ public struct RouterCreator {
         router.all("/", middleware: CORS(options: corsOptions))
 
         router.get("/", handler: getTodos)
-
+        router.post("/", handler: addTodo)
         return router
-    }
-
-    private func getTodos(completion: ([Todo]?, RequestError?) -> Void) {
-       dataLayer.get() { result in
-           switch result {
-               case .success(let todos):
-                   completion(todos.map { dataLayerTodoConverter.convert($0) }, nil)
-               case .failure(let error):
-                   completion(nil, dataLayerErrorConverter.convert(error))
-           }
-       }
     }
 }
