@@ -31,7 +31,7 @@ public struct RouterCreator {
         self.dataLayerConverter = DataLayerConverter(baseURL: baseURL)
     }
 
-    public func create(dataLayer: DataLayer, baseURL: URL) -> Router {
+    public func create() -> Router {
         let router = Router()
 
         let corsOptions = Options(allowedOrigin: .origin("https://www.todobackend.com"),
