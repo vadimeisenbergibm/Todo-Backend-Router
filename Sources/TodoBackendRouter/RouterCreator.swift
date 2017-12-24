@@ -21,9 +21,10 @@ import TodoBackendDataLayer
 public struct RouterCreator {
     public static func create(dataLayer: DataLayer) -> Router {
         let router = Router()
+        let corsOptions = Options(allowedOrigin: .origin("https://www.todobackend.com"),
+               methods: ["GET","POST", "PATCH", "DELETE", "OPTIONS"])
+        router.all("/", middleware: CORS(options: corsOptions))
 
-        router.all("/", middleware: CORS(options: Options(allowedOrigin: .origin("https://www.todobackend.com"),
-                                                          methods: ["GET","POST", "PATCH", "DELETE", "OPTIONS"])))
         return router
     }
 }
