@@ -26,7 +26,7 @@ public struct RouterCreator {
     private let dataLayer: DataLayer
     private let dataLayerConverter: DataLayerConverter
 
-    init(dataLayer: DataLayer, baseURL: URL) {
+    public init(dataLayer: DataLayer, baseURL: URL) {
         self.dataLayer = dataLayer
         self.dataLayerConverter = DataLayerConverter(baseURL: baseURL)
     }
