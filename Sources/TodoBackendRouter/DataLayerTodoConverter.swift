@@ -16,12 +16,20 @@
 
 import Foundation
 import TodoBackendDataLayer
+import KituraContracts
 
-struct DataLayerTodoConverter {
+struct DataLayerConverter {
     let baseURL: URL
 
     func convert(_ todo: TodoBackendDataLayer.Todo) -> Todo {
         let url = baseURL.appendingPathComponent(todo.id)
         return Todo(title: todo.title, order: todo.order, completed: todo.completed, url: url)
+    }
+
+    func convert(_ error: DataLayerError) -> RequestError {
+        switch error {
+        case .todoNotFound: return .notFound
+        case .internalError: return .internalServerError
+        }
     }
 }
