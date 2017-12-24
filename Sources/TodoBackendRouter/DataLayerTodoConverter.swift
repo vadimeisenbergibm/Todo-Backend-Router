@@ -17,7 +17,7 @@
 import Foundation
 import TodoBackendDataLayer
 
-struct DataLayerTodoConvertor {
+struct DataLayerTodoConverter {
     let baseURL: URL
 
     func convert(todo: TodoBackendDataLayer.Todo) -> Todo {
