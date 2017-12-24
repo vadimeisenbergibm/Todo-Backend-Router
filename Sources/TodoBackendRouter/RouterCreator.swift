@@ -23,35 +23,61 @@ import KituraCORS
 import TodoBackendDataLayer
 
 public struct RouterCreator {
-
     public static func create(dataLayer: DataLayer, baseURL: URL) -> Router {
-        var dataLayer = dataLayer
-        let dataLayerTodoConverter = DataLayerTodoConverter(baseURL: baseURL)
-        let dataLayerErrorConverter = DataLayerErrorConverter()
+        let dataLayerConverter = DataLayerConverter(baseURL: baseURL)
 
-        func getTodos(completion: ([Todo]?, RequestError?) -> Void) {
-            dataLayer.get() { result in
-                switch result {
-                case .success(let todos):
-                    completion(todos.map { dataLayerTodoConverter.convert($0) }, nil)
-                case .failure(let error):
-                    completion(nil, dataLayerErrorConverter.convert(error))
-                }
-            }
-        }
+        let router = Router()
+        cors(router: router)
+        getTodo(router: router, dataLayer: dataLayer, dataLayerConverter: dataLayerConverter)
+        getTodos(router: router, dataLayer: dataLayer, dataLayerConverter: dataLayerConverter)
 
-        func getTodo(id: String, completion: (Todo?, RequestError?) -> Void) {
+        addTodo(router: router, dataLayer: dataLayer, dataLayerConverter: dataLayerConverter)
+
+        deleteTodo(router: router, dataLayer: dataLayer, dataLayerConverter: dataLayerConverter)
+        deleteTodos(router: router, dataLayer: dataLayer, dataLayerConverter: dataLayerConverter)
+
+        return router
+    }
+
+    private static func cors(router: Router) {
+        let corsOptions = Options(allowedOrigin: .origin("https://www.todobackend.com"),
+                                  methods: ["GET","POST", "PATCH", "DELETE", "OPTIONS"])
+        router.all("/", middleware: CORS(options: corsOptions))
+    }
+
+    private static func getTodo(router: Router, dataLayer: DataLayer,
+                                dataLayerConverter: DataLayerConverter) {
+        router.get("/") { (id: String, completion: ((Todo?, RequestError?) -> Void)) in
             dataLayer.get(id: id) { result in
                 switch result {
                 case .success(let todo):
-                    completion(dataLayerTodoConverter.convert(todo), nil)
+                    completion(dataLayerConverter.convert(todo), nil)
                 case .failure(let error):
-                    completion(nil, dataLayerErrorConverter.convert(error))
+                    completion(nil, dataLayerConverter.convert(error))
                 }
             }
         }
+    }
 
-        func addTodo(todoPatch: TodoPatch, completion: (Todo?, RequestError?) -> Void ) {
+    private static func getTodos(router: Router, dataLayer: DataLayer,
+                                 dataLayerConverter: DataLayerConverter) {
+        router.get("/") { (completion: (([Todo]?, RequestError?) -> Void)) in
+            dataLayer.get() { result in
+                switch result {
+                case .success(let todos):
+                    completion(todos.map { dataLayerConverter.convert($0) }, nil)
+                case .failure(let error):
+                    completion(nil, dataLayerConverter.convert(error))
+                }
+            }
+        }
+    }
+
+
+    private static func addTodo(router: Router, dataLayer: DataLayer,
+                                dataLayerConverter: DataLayerConverter) {
+        var dataLayer = dataLayer
+        router.post("/") { (todoPatch: TodoPatch, completion: (Todo?, RequestError?) -> Void) in
             guard let title = todoPatch.title, title != "" else {
                 return completion(nil, .badRequest)
             }
@@ -61,49 +87,41 @@ public struct RouterCreator {
             dataLayer.add(title: title, order: order, completed: completed) { result in
                 switch result {
                 case .success(let todo):
-                    completion(dataLayerTodoConverter.convert(todo), nil)
+                    completion(dataLayerConverter.convert(todo), nil)
                 case .failure(let error):
-                    completion(nil, dataLayerErrorConverter.convert(error))
+                    completion(nil, dataLayerConverter.convert(error))
                 }
             }
         }
+    }
 
-        func deleteTodo(id: String, completion: (RequestError?) -> Void) {
+    private static func deleteTodo(router: Router, dataLayer: DataLayer,
+                                   dataLayerConverter: DataLayerConverter) {
+        var dataLayer = dataLayer
+        router.delete("/") { (id: String, completion: (RequestError?) -> Void) in
             dataLayer.delete(id: id) { result in
                 switch result {
                 case .success:
                     completion(nil)
                 case .failure(let error):
-                    completion(dataLayerErrorConverter.convert(error))
+                    completion(dataLayerConverter.convert(error))
                 }
             }
         }
+    }
 
-        func deleteTodos(completion: (RequestError?) -> Void) {
+    private static func deleteTodos(router: Router, dataLayer: DataLayer,
+                                    dataLayerConverter: DataLayerConverter) {
+        var dataLayer = dataLayer
+        router.delete("/") { (completion: (RequestError?) -> Void) in
             dataLayer.delete() { result in
                 switch result {
                 case .success:
                     completion(nil)
                 case .failure(let error):
-                    completion(dataLayerErrorConverter.convert(error))
+                    completion(dataLayerConverter.convert(error))
                 }
             }
         }
-
-        let router = Router()
-
-        let corsOptions = Options(allowedOrigin: .origin("https://www.todobackend.com"),
-               methods: ["GET","POST", "PATCH", "DELETE", "OPTIONS"])
-        router.all("/", middleware: CORS(options: corsOptions))
-
-        router.get("/", handler: getTodos)
-        router.get("/", handler: getTodo)
-
-        router.post("/", handler: addTodo)
-
-        router.delete("/", handler: deleteTodos)
-        router.delete("/", handler: deleteTodo)
-
-        return router
     }
 }
