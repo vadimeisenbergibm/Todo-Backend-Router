@@ -46,6 +46,8 @@ public struct RouterCreator {
         router.delete("/", handler: deleteTodos)
         router.delete("/", handler: deleteTodo)
 
+        router.patch("/", handler: updateTodo)
+
         return router
     }
 
@@ -112,6 +114,14 @@ public struct RouterCreator {
     private func deleteTodos(completion: (RequestError?) -> Void) {
         dataLayer.delete() { result in
              completionWithoutTodos(result: result, completion: completion)
+        }
+    }
+
+    private func updateTodo(id: String, todoPatch: TodoPatch,
+                            completion: (Todo?, RequestError?) -> Void ) {
+        dataLayer.update(id: id, title: todoPatch.title, order: todoPatch.order,
+                         completed: todoPatch.completed) { result in
+            completionWithSingleTodo(result: result, completion: completion)
         }
     }
 }
