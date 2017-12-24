@@ -14,17 +14,44 @@
  * limitations under the License.
  **/
 
+import Foundation
+
 import Kitura
+import KituraContracts
 import KituraCORS
+
 import TodoBackendDataLayer
 
 public struct RouterCreator {
-    public static func create(dataLayer: DataLayer) -> Router {
+    private let dataLayer: DataLayer
+    private let dataLayerTodoConverter: DataLayerTodoConverter
+    private let dataLayerErrorConverter = DataLayerErrorConverter()
+
+    public init(dataLayer: DataLayer, baseURL: URL) {
+        self.dataLayer = dataLayer
+        self.dataLayerTodoConverter = DataLayerTodoConverter(baseURL: baseURL)
+    }
+
+    public func create(dataLayer: DataLayer, baseURL: URL) -> Router {
         let router = Router()
+
         let corsOptions = Options(allowedOrigin: .origin("https://www.todobackend.com"),
                methods: ["GET","POST", "PATCH", "DELETE", "OPTIONS"])
         router.all("/", middleware: CORS(options: corsOptions))
 
+        router.get("/", handler: getTodos)
+
         return router
+    }
+
+    private func getTodos(completion: ([Todo]?, RequestError?) -> Void) {
+       dataLayer.get() { result in
+           switch result {
+               case .success(let todos):
+                   completion(todos.map { dataLayerTodoConverter.convert($0) }, nil)
+               case .failure(let error):
+                   completion(nil, dataLayerErrorConverter.convert(error))
+           }
+       }
     }
 }
