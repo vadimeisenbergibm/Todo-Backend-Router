@@ -23,11 +23,15 @@ import KituraCORS
 import TodoBackendDataLayer
 
 public struct RouterCreator {
+    let dataLayer: DataLayer
+    let dataLayerConverter: DataLayerConverter
 
-    public static func create(dataLayer: DataLayer, baseURL: URL) -> Router {
-        var dataLayer = dataLayer
-        let dataLayerConverter = DataLayerConverter(baseURL: baseURL)
+    init(dataLayer: DataLayer, baseURL: URL) {
+        self.dataLayer = dataLayer
+        self.dataLayerConverter = DataLayerConverter(baseURL: baseURL)
+    }
 
+    public func create(dataLayer: DataLayer, baseURL: URL) -> Router {
         func getTodos(completion: ([Todo]?, RequestError?) -> Void) {
             dataLayer.get() { result in
                 switch result {
