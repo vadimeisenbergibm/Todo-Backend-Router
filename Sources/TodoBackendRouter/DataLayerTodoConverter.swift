@@ -20,7 +20,7 @@ import TodoBackendDataLayer
 struct DataLayerTodoConverter {
     let baseURL: URL
 
-    func convert(todo: TodoBackendDataLayer.Todo) -> Todo {
+    func convert(_ todo: TodoBackendDataLayer.Todo) -> Todo {
         let url = baseURL.appendingPathComponent(todo.id)
         return Todo(title: todo.title, order: todo.order, completed: todo.completed, url: url)
     }
