@@ -32,67 +32,6 @@ public struct RouterCreator {
     }
 
     public func create(dataLayer: DataLayer, baseURL: URL) -> Router {
-        func getTodos(completion: ([Todo]?, RequestError?) -> Void) {
-            dataLayer.get() { result in
-                switch result {
-                case .success(let todos):
-                    completion(todos.map { dataLayerConverter.convert($0) }, nil)
-                case .failure(let error):
-                    completion(nil, dataLayerConverter.convert(error))
-                }
-            }
-        }
-
-        func getTodo(id: String, completion: (Todo?, RequestError?) -> Void) {
-            dataLayer.get(id: id) { result in
-                switch result {
-                case .success(let todo):
-                    completion(dataLayerConverter.convert(todo), nil)
-                case .failure(let error):
-                    completion(nil, dataLayerConverter.convert(error))
-                }
-            }
-        }
-
-        func addTodo(todoPatch: TodoPatch, completion: (Todo?, RequestError?) -> Void ) {
-            guard let title = todoPatch.title, title != "" else {
-                return completion(nil, .badRequest)
-            }
-            let completed = todoPatch.completed ?? false
-            let order = todoPatch.order
-
-            dataLayer.add(title: title, order: order, completed: completed) { result in
-                switch result {
-                case .success(let todo):
-                    completion(dataLayerConverter.convert(todo), nil)
-                case .failure(let error):
-                    completion(nil, dataLayerConverter.convert(error))
-                }
-            }
-        }
-
-        func deleteTodo(id: String, completion: (RequestError?) -> Void) {
-            dataLayer.delete(id: id) { result in
-                switch result {
-                case .success:
-                    completion(nil)
-                case .failure(let error):
-                    completion(dataLayerConverter.convert(error))
-                }
-            }
-        }
-
-        func deleteTodos(completion: (RequestError?) -> Void) {
-            dataLayer.delete() { result in
-                switch result {
-                case .success:
-                    completion(nil)
-                case .failure(let error):
-                    completion(dataLayerConverter.convert(error))
-                }
-            }
-        }
-
         let router = Router()
 
         let corsOptions = Options(allowedOrigin: .origin("https://www.todobackend.com"),
@@ -108,5 +47,66 @@ public struct RouterCreator {
         router.delete("/", handler: deleteTodo)
 
         return router
+    }
+
+    func getTodos(completion: ([Todo]?, RequestError?) -> Void) {
+        dataLayer.get() { result in
+            switch result {
+            case .success(let todos):
+                completion(todos.map { dataLayerConverter.convert($0) }, nil)
+            case .failure(let error):
+                completion(nil, dataLayerConverter.convert(error))
+            }
+        }
+    }
+
+    func getTodo(id: String, completion: (Todo?, RequestError?) -> Void) {
+        dataLayer.get(id: id) { result in
+            switch result {
+            case .success(let todo):
+                completion(dataLayerConverter.convert(todo), nil)
+            case .failure(let error):
+                completion(nil, dataLayerConverter.convert(error))
+            }
+        }
+    }
+
+    func addTodo(todoPatch: TodoPatch, completion: (Todo?, RequestError?) -> Void ) {
+        guard let title = todoPatch.title, title != "" else {
+            return completion(nil, .badRequest)
+        }
+        let completed = todoPatch.completed ?? false
+        let order = todoPatch.order
+
+        dataLayer.add(title: title, order: order, completed: completed) { result in
+            switch result {
+            case .success(let todo):
+                completion(dataLayerConverter.convert(todo), nil)
+            case .failure(let error):
+                completion(nil, dataLayerConverter.convert(error))
+            }
+        }
+    }
+
+    func deleteTodo(id: String, completion: (RequestError?) -> Void) {
+        dataLayer.delete(id: id) { result in
+            switch result {
+            case .success:
+                completion(nil)
+            case .failure(let error):
+                completion(dataLayerConverter.convert(error))
+            }
+        }
+    }
+
+    func deleteTodos(completion: (RequestError?) -> Void) {
+        dataLayer.delete() { result in
+            switch result {
+            case .success:
+                completion(nil)
+            case .failure(let error):
+                completion(dataLayerConverter.convert(error))
+            }
+        }
     }
 }
