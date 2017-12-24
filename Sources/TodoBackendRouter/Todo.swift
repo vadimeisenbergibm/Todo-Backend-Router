@@ -16,7 +16,7 @@
 
 import Foundation
 
-public struct Todo: Encodable {
+public struct Todo: Codable {
     public var title: String
     public var order: Int?
     public var completed: Bool
