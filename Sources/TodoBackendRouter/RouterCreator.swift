@@ -73,7 +73,6 @@ public struct RouterCreator {
         }
     }
 
-
     private static func addTodo(router: Router, dataLayer: DataLayer,
                                 dataLayerConverter: DataLayerConverter) {
         var dataLayer = dataLayer
