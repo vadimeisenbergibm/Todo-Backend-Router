@@ -51,41 +51,12 @@ public struct RouterCreator {
         return router
     }
 
-    private func completionWithMultipleTodos(result: Result<[TodoBackendDataLayer.Todo]>,
-                                             completion: ([Todo]?, RequestError?) -> Void) {
-        switch result {
-        case .success(let todos):
-            completion(todos.map { dataLayerConverter.convert($0) }, nil)
-        case .failure(let error):
-            completion(nil, dataLayerConverter.convert(error))
-        }
-    }
-
     private func getTodos(completion: ([Todo]?, RequestError?) -> Void) {
         dataLayer.get() { result in
             completionWithMultipleTodos(result: result, completion: completion)
         }
     }
 
-    private func completionWithSingleTodo(result: Result<TodoBackendDataLayer.Todo>,
-                                             completion: (Todo?, RequestError?) -> Void) {
-        switch result {
-        case .success(let todo):
-            completion(dataLayerConverter.convert(todo), nil)
-        case .failure(let error):
-            completion(nil, dataLayerConverter.convert(error))
-        }
-    }
-
-    private func completionWithoutTodos(result: Result<Void>,
-                                        completion: (RequestError?) -> Void) {
-        switch result {
-        case .success:
-            completion(nil)
-        case .failure(let error):
-            completion(dataLayerConverter.convert(error))
-        }
-    }
 
     private func getTodo(id: String, completion: (Todo?, RequestError?) -> Void) {
         dataLayer.get(id: id) { result in
@@ -122,6 +93,36 @@ public struct RouterCreator {
         dataLayer.update(id: id, title: todoPatch.title, order: todoPatch.order,
                          completed: todoPatch.completed) { result in
             completionWithSingleTodo(result: result, completion: completion)
+        }
+    }
+
+    private func completionWithMultipleTodos(result: Result<[TodoBackendDataLayer.Todo]>,
+                                             completion: ([Todo]?, RequestError?) -> Void) {
+        switch result {
+        case .success(let todos):
+            completion(todos.map { dataLayerConverter.convert($0) }, nil)
+        case .failure(let error):
+            completion(nil, dataLayerConverter.convert(error))
+        }
+    }
+
+    private func completionWithSingleTodo(result: Result<TodoBackendDataLayer.Todo>,
+                                             completion: (Todo?, RequestError?) -> Void) {
+        switch result {
+        case .success(let todo):
+            completion(dataLayerConverter.convert(todo), nil)
+        case .failure(let error):
+            completion(nil, dataLayerConverter.convert(error))
+        }
+    }
+
+    private func completionWithoutTodos(result: Result<Void>,
+                                        completion: (RequestError?) -> Void) {
+        switch result {
+        case .success:
+            completion(nil)
+        case .failure(let error):
+            completion(dataLayerConverter.convert(error))
         }
     }
 }
